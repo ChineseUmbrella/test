@@ -47,7 +47,9 @@
 
     const windowWidth = 500;
     const windowHeight = 340;
-    window.initConfig=[];
+    if(typeof initConfig==="undefined"){
+        window.initConfig=[];    
+    }    
     setTimeout(function () {
         initConfig.forEach(function (windowConfig) {
             const tty = new Window();
