@@ -46,13 +46,19 @@
     tty.elements;
 
     const windowWidth = 500;
-    const windowHeight = 340;
-    if(typeof initConfig==="undefined"){
-        window.initConfig=[];    
-    }    
+    const windowHeight = 360;
+    if (typeof initConfig === "undefined") {
+        window.initConfig = [];
+    }
     setTimeout(function () {
         initConfig.forEach(function (windowConfig) {
-            const tty = new Window();
+            if(windowConfig.path&&!windowConfig.title){
+                windowConfig.title=windowConfig.path.match(/([\w\-]+)[/]?$/)[1];
+            }
+            const tty = new Window({
+                initTab: false,
+                title:windowConfig.title
+            });
             tty.resize(70, 24);
             if (typeof windowConfig.x !== "undefined") {
                 tty.$dom.css("left", windowConfig.x * windowWidth + 10 + "px");
@@ -64,11 +70,14 @@
                 windowConfig.tabs.forEach(function (tabConfig) {
                     const tab = tty.createTab();
                     setTimeout(function () {
+                        if (windowConfig.path) {
+                            tab.doCmd(`cd ${windowConfig.path}`);
+                        }
+                        tab.doCmd(`source ~/.bashrc`);
+
                         if (tabConfig.cmds) {
-                            if (windowConfig.path) {
-                                tab.doCmd(`cd ${windowConfig.path}`);
-                            }
-                            tab.doCmd(`source ~/.bashrc`);
+
+
                             tabConfig.cmds.forEach(function (cmd) {
                                 tab.doCmd(cmd);
                             });
@@ -159,7 +168,7 @@
         'scroll lock': 145,
         'my computer': 182,
         'my calculator': 183,
-        ':':58,
+        ':': 58,
         ';': 186,
         '=': 187,
         ',': 188,
@@ -173,16 +182,7 @@
         "'": 222
     }
 
-
-    //for (i = 97; i < 123; i++) keyEventCodes[String.fromCharCode(i)] = i - 32
-
-    // numbers
-    //for (var i = 48; i < 58; i++) keyEventCodes[i - 48] = i
-
-    // function keys
     for (i = 1; i < 13; i++) keyEventCodes['f' + i] = i + 111;
-
-    // numpad keys
     for (i = 0; i < 10; i++) keyEventCodes['numpad ' + i] = i + 96;
 
 
@@ -260,7 +260,7 @@
 
             Object.keys(terms).forEach(function (key) {
                 var data = terms[key],
-                    win = new Window,
+                    win = new Window(),
                     tab = win.tabs[0];
 
                 delete tty.terms[tab.id];
@@ -335,8 +335,12 @@
      * Window
      */
 
-    function Window(socket) {
+    function Window(args = {}) {
         'use static';
+
+        const {
+            socket, initTab = true,title
+        } = args;
         var self = this;
 
         EventEmitter.call(this);
@@ -345,7 +349,7 @@
             <div class="grip"></div>
             <div class="bar">
                 <div title="new/close" class="tab">~</div>
-                <div class="title"></div>
+                <div class="title">${title}</div>
             </div>
         </div>`);
         const $$ = $window.find.bind($window);
@@ -353,9 +357,9 @@
         this.socket = socket || tty.socket;
         this.element = $window[0];
         this.$dom = $window;
-        this.grip = $$(".grip")[0];
-        this.bar = $$(".bar")[0];
-        this.button = $$(".tab")[0];
+        this.$grip = $$(".grip");
+        this.$bar = $$(".bar");
+        this.$button = $$(".tab");
         this.title = $$(".title")[0];
 
         this.tabs = [];
@@ -367,30 +371,21 @@
         body.appendChild($window[0]);
 
         tty.windows.push(this);
+        if (initTab) {
+            const tab = this.createTab();
+            this.tabs.push(tab);
+        }
 
-        //        const tab = this.createTab();
         //        console.log(tab);
         console.log(this);
         this.focus();
-        this.bind();
 
-        //        this.tabs[0].once('open', function () {
-        //            tty.emit('open window', self);
-        //            self.emit('open');
-        //        });
-    }
-
-    inherits(Window, EventEmitter);
-
-    Window.prototype.bind = function () {
-        var self = this,
-            el = this.element,
-            bar = this.bar,
-            grip = this.grip,
-            button = this.button,
-            last = 0;
-
-        on(button, 'click', function (ev) {
+        this.$grip.on("mousedown", function (ev) {
+            self.focus();
+            self.resizing(ev);
+            return cancel(ev);
+        });
+        this.$button.on("click", function (ev) {
             if (ev.ctrlKey || ev.altKey || ev.metaKey || ev.shiftKey) {
                 self.destroy();
             } else {
@@ -398,30 +393,34 @@
             }
             return cancel(ev);
         });
+        var last = 0;
 
-        on(grip, 'mousedown', function (ev) {
-            self.focus();
-            self.resizing(ev);
-            return cancel(ev);
-        });
+        this.$dom.on('mousedown', (ev) => {
+            if (ev.target !== this.$dom[0] && ev.target !== this.$bar[0]) {
+                return;
+            }
 
-        on(el, 'mousedown', function (ev) {
-            if (ev.target !== el && ev.target !== bar) return;
-
-            self.focus();
-
+            this.focus();
             cancel(ev);
-
             if (new Date - last < 600) {
-                return self.maximize();
+                return this.maximize();
             }
             last = new Date;
-
-            self.drag(ev);
+            this.drag(ev);
 
             return cancel(ev);
         });
-    };
+
+        if (this.tabs.length) {
+            this.tabs[0].once('open', function () {
+                tty.emit('open window', self);
+                self.emit('open');
+            });
+        }
+
+    }
+
+    inherits(Window, EventEmitter);
 
     Window.prototype.focus = function () {
         // Restack
@@ -585,7 +584,7 @@
             term.element.style.width = '';
             term.element.style.height = '';
             el.style.boxSizing = '';
-            self.grip.style.display = '';
+            self.$grip.show();
             root.className = m.root;
 
             self.resize(m.cols, m.rows);
@@ -608,7 +607,7 @@
         term.element.style.width = '100%';
         term.element.style.height = '100%';
         el.style.boxSizing = 'border-box';
-        this.grip.style.display = 'none';
+        this.$grip.hide();
         root.className = 'maximized';
 
         this.resize(x, y);
@@ -681,20 +680,18 @@
     function Tab(win, socket) {
         var self = this;
 
-        var cols = win.cols,
-            rows = win.rows;
-
+        const {
+            cols, rows
+        } = win;
         Terminal.call(this, {
-            cols: cols,
-            rows: rows
+            cols,
+            rows
         });
 
-        var button = document.createElement('div');
-        button.className = 'tab';
-        button.innerHTML = '\u2022';
-        win.bar.appendChild(button);
+        var $button = $(`<div class="tab">bash</div>`);
+        win.$bar.append($button);
 
-        on(button, 'click', function (ev) {
+        $button.on("click", function (ev) {
             if (ev.ctrlKey || ev.altKey || ev.metaKey || ev.shiftKey) {
                 self.destroy();
             } else {
@@ -703,10 +700,12 @@
             return cancel(ev);
         });
 
+
         this.id = '';
         this.socket = socket || tty.socket;
         this.window = win;
-        this.button = button;
+        this.button = $button[0];
+        this.$button=$button;
         this.element = null;
         this.process = '';
         this.open();
@@ -747,7 +746,7 @@
         }
 
         if (this.window.focused === this) {
-            this.window.bar.title = title;
+            this.window.$bar.attr("title", title)
             // this.setProcessName(this.process);
         }
     };
@@ -772,16 +771,15 @@
                 if (win.focused.element.parentNode) {
                     win.focused.element.parentNode.removeChild(win.focused.element);
                 }
-                win.focused.button.style.fontWeight = '';
+                win.focused.$button.removeClass("active");
             }
 
             win.element.appendChild(this.element);
             win.focused = this;
 
-            win.title.innerHTML = this.process;
             document.title = this.title || initialTitle;
-            this.button.style.fontWeight = 'bold';
-            this.button.style.color = '';
+            this.$button.addClass("active");
+            
         }
 
         this.handleTitle(this.title);
@@ -980,13 +978,7 @@
 
         this.process = name;
         this.button.title = name;
-
-        if (this.window.focused === this) {
-            // if (this.title) {
-            //   name += ' (' + this.title + ')';
-            // }
-            this.window.title.innerHTML = name;
-        }
+        this.$button.text(name);
     };
 
     /**
