@@ -348,7 +348,7 @@
         const $window = $(`<div class="window">
             <div class="grip"></div>
             <div class="bar">
-                <div title="new/close" class="tab">~</div>
+                <div title="new" class="tab">+</div>
                 <div class="title">${title}</div>
             </div>
         </div>`);
@@ -360,7 +360,7 @@
         this.$grip = $$(".grip");
         this.$bar = $$(".bar");
         this.$button = $$(".tab");
-        this.title = $$(".title")[0];
+        this.$title = $$(".title");
 
         this.tabs = [];
         this.focused = null;
@@ -375,9 +375,7 @@
             const tab = this.createTab();
             this.tabs.push(tab);
         }
-
-        //        console.log(tab);
-        console.log(this);
+        
         this.focus();
 
         this.$grip.on("mousedown", function (ev) {
@@ -386,29 +384,15 @@
             return cancel(ev);
         });
         this.$button.on("click", function (ev) {
-            if (ev.ctrlKey || ev.altKey || ev.metaKey || ev.shiftKey) {
-                self.destroy();
-            } else {
-                self.createTab();
-            }
+            self.createTab();
             return cancel(ev);
         });
-        var last = 0;
-
-        this.$dom.on('mousedown', (ev) => {
-            if (ev.target !== this.$dom[0] && ev.target !== this.$bar[0]) {
-                return;
-            }
-
+        this.$bar.on('dblclick',(ev)=>{   
+            return this.maximize();
+        });
+        this.$bar.on('mousedown', (ev) => {
             this.focus();
-            cancel(ev);
-            if (new Date - last < 600) {
-                return this.maximize();
-            }
-            last = new Date;
             this.drag(ev);
-
-            return cancel(ev);
         });
 
         if (this.tabs.length) {

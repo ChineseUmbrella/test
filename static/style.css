@@ -89,6 +89,7 @@ body {
 .tab.active {
     font-weight: bold;
     opacity: 1;
+    border-bottom: 2px solid #d64937;
 }
 .tab:hover {
     font-weight: bold;
