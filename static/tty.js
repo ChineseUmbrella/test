@@ -391,8 +391,12 @@
             return this.maximize();
         });
         this.$bar.on('mousedown', (ev) => {
-            this.focus();
-            this.drag(ev);
+            if(ev.target===this.$bar[0]){
+                this.focus();    
+                this.drag(ev);
+            }
+            
+            
         });
 
         if (this.tabs.length) {
