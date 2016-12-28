@@ -53,7 +53,7 @@
     setTimeout(function () {
         initConfig.forEach(function (windowConfig) {
             if(windowConfig.path&&!windowConfig.title){
-                windowConfig.title=windowConfig.path.match(/([\w\-]+)[/]?$/)[1];
+                windowConfig.title=(windowConfig.path.match(/([\w\-]+)[/]?$/)||[])[1]||windowConfig.path;
             }
             const tty = new Window({
                 initTab: false,
@@ -75,19 +75,36 @@
                         }
                         tab.doCmd(`source ~/.bashrc`);
 
-                        if (tabConfig.cmds) {
-
-
-                            tabConfig.cmds.forEach(function (cmd) {
-                                tab.doCmd(cmd);
-                            });
+                        if (tabConfig.cmds&&tabConfig.cmds.length) {
+                            let cmdIndex=0;
+                            function cmdCb(){
+                                if(cmdIndex===tabConfig.cmds.length){
+                                    return;
+                                }
+                                const cmd=tabConfig.cmds[cmdIndex];
+                                cmdIndex++;
+                                tab.doCmd(cmd,cmdCb);                                
+                            }
+                            cmdCb();
+                            
+                            
+//                            tabConfig.cmds.forEach(function (cmd) {
+//                                tab.doCmd(cmd,cb);
+//                            });
                         }
                     }, 200);
                 });
             }, 1500);
         });
     }, 1000);
-    Terminal.prototype.doCmd = function (str) {
+    Terminal.prototype.doCmd = function (str,cb) {
+        if(str.match(/^\d+.?\d*s$/)){
+            const time=parseFloat(str.match(/^[\d\.]+/))*1000;
+            setTimeout(function(){
+                cb&&cb();
+            },time);
+            return;
+        }
         for (let i = 0; i < str.length; i++) {
             this.keyPress({
                 which: getKeyCode(str[i]),
@@ -96,7 +113,7 @@
         this.keyPress({
             which: 13
         });
-
+        cb&&cb();        
     }
 
     window.getKeyCode = getKeyCode;
