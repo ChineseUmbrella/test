@@ -46,7 +46,7 @@
     tty.elements;
 
     const windowWidth = 500;
-    const windowHeight = 360;
+    const windowHeight = 380;
     if (typeof initConfig === "undefined") {
         window.initConfig = [];
     }
@@ -59,7 +59,7 @@
                 initTab: false,
                 title:windowConfig.title
             });
-            tty.resize(70, 24);
+//            tty.resize(60, 24);
             if (typeof windowConfig.x !== "undefined") {
                 tty.$dom.css("left", windowConfig.x * windowWidth + 10 + "px");
             }
