@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>SeaServer</title>
+
+    <meta name="description" content="Easy to release, protect and monitor a large number of micro service, and bring good virtual terminal">
+    <meta name="description" content="轻松的发布、守护和监控大量微服务，并自带良好的虚拟终端">
+    <meta name="郑与天" content="developer.yutin@foxmail.com">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="css/style3.css" rel="stylesheet">
+
+  </head>
+  <body>
+    
+    <div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<nav class="navbar navbar-default" role="navigation">
+				<div class="navbar-header">
+					 
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+						 <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+					</button> <a class="navbar-brand" href="/">SeaServer</a>
+				</div>
+				
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li>
+							<a id="open">打开终端</a>
+						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="http://zhengyutian.com">联系作者</a>
+						</li>
+					</ul>
+				</div>
+				
+			</nav>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="tabbable" id="tabs-570768">
+				<ul class="nav nav-tabs">
+					<li class="active">
+						<a href="#panel-201663" data-toggle="tab" onclick="get_server_list()">服务列表</a>
+					</li>
+					<li>
+						<a href="#panel-983436" data-toggle="tab" onclick="get_file_list()">上传服务</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="panel-201663">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>
+									序号
+								   </th>
+									<th>
+									服务
+									</th>
+									<th>
+									状态
+									</th>
+									<th>
+									内存
+									</th>
+									<th>
+								    CPU
+									</th>
+									<th>
+									功能
+									</th>
+								</tr>
+							</thead>
+							<tbody id="server_list">
+							</tbody>
+						</table>
+					</div>
+
+					<div class="tab-pane" id="panel-983436">
+					  <div>
+
+					   	<form method="post" enctype="multipart/form-data" action="/docker">
+         					<input type="file" name="docker_file">
+        					 <input type="submit" value="上传文件到容器" onclick="get_file_list()">
+     				     </form>
+
+					  	 <table class="table">
+                           <thead>
+                             <tr>
+                               <th>
+                               序号
+                               </th>
+                               <th>
+                                文件名称
+                               </th>
+                               <th>
+                                功能列表
+                               </th>
+                            </tr>
+                           </thead>
+                           <tbody id="download_list">                         	
+                           </tbody>
+                       </table>
+      			      </div>  
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+	<script src="/js/jquery-3.1.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/scripts.js"></script>
+
+    <script src="socket.io/socket.io.js"></script>
+    <script src="/js/term.js"></script>
+    <script src="/js/tty.js"></script>
+
+    <script src="/js/docker_list.js"></script>
+    <script src="/js/server_list.js"></script>
+    <script type="text/javascript">get_server_list()</script>
+  </body>
+</html>

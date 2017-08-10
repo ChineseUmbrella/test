@@ -1,0 +1,40 @@
+<!Doctype html>
+
+<head>
+    <title>兴海海服务</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <!--<link rel="stylesheet" href="user.css">-->
+</head>
+
+<body>
+    <h1>Sea Server</h1>
+    <button id="open">打开终端</button>
+    
+    <div id='help'>
+        <p>输入'exit'退出终端</p>
+        <p>双击终端TopBar终端全屏</p>
+    </div>
+    <button id="lights">亮度切换</button>
+    <div id="docker">
+        <form method="post" enctype="multipart/form-data" action="/docker">
+         <input type="file" name="docker_file">
+         <input type="submit" value="上传文件到容器">
+        </form>
+
+        <div id="download_list">
+        </div>  
+    </div>
+
+    <script src="/js/jquery-3.1.1.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="/js/term.js"></script>
+    <script src="/js/tty.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/scripts.js"></script>
+    <script src="./js/docker_list.js"></script>
+    <script type="text/javascript">
+      show_dockers("<%=files%>")
+    </script>
+</body>
+
+<!--<script src="user.js"></script>-->

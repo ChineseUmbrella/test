@@ -1,0 +1,75 @@
+worker_processes  1;
+
+events {
+
+    worker_connections  1024;
+
+}
+
+ 
+
+http {
+
+    include       mime.types;
+
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+
+ 
+
+    upstream backend {
+
+             #ip_hash;
+
+             server 192.168.0.69:3000;
+
+             server 192.168.0.69:8000;
+
+             server 192.168.0.69:8001;
+
+             server 192.168.0.69:8002;
+
+         }
+
+ 
+
+    server {
+
+        listen       80;
+
+        server_name  2;
+
+ 
+
+        location / {
+
+        #设置主机头和客户端真实地址，以便服务器获取客户端真实IP
+
+             proxy_set_header Host $host;
+
+             proxy_set_header X-Real-IP $remote_addr;
+
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+ 
+
+             #禁用缓存
+
+             proxy_buffering off;
+
+ 
+
+             #反向代理的地址
+
+             proxy_pass http://backend;     
+
+        }
+
+    }
+
+ 
+
+}

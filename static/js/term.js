@@ -1231,6 +1231,7 @@ Terminal.prototype.destroy = function() {
   this.end = function() {};
 
   if (this.element.parentNode) {
+
     this.element.parentNode.removeChild(this.element);
   }
 

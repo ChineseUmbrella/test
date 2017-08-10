@@ -1,3 +1,5 @@
+#file
+npm install --save express-fileupload
 # tty.js
 
 A terminal in your browser using node.js and socket.io. Based on Fabrice

@@ -1,5 +1,5 @@
 {
-  "name": "tty.js",
+  "name": "xh.js",
   "description": "A terminal for your browser",
   "author": "Christopher Jeffrey",
   "version": "0.2.15",
@@ -7,16 +7,36 @@
   "main": "./index.js",
   "bin": "./bin/tty.js",
   "man": "./man/tty.js.1",
+  "scripts": {
+    "start": "pm2 index.js"
+  },
   "preferGlobal": false,
   "repository": "git://github.com/chjj/tty.js.git",
   "homepage": "https://github.com/chjj/tty.js",
-  "bugs": { "url": "https://github.com/chjj/tty.js/issues" },
-  "keywords": ["tty", "terminal", "term", "xterm"],
-  "tags": ["tty", "terminal", "term", "xterm"],
+  "bugs": {
+    "url": "https://github.com/chjj/tty.js/issues"
+  },
+  "keywords": [
+    "tty",
+    "terminal",
+    "term",
+    "xterm"
+  ],
+  "tags": [
+    "tty",
+    "terminal",
+    "term",
+    "xterm"
+  ],
   "dependencies": {
+    "ejs": "^2.5.7",
     "express": "3.4.4",
+    "express-fileupload": "^0.1.4",
+    "glob": "^7.1.2",
     "pty.js": ">= 0.2.13",
     "term.js": ">= 0.0.5"
   },
-  "engines": { "node": ">= 0.8.0" }
+  "engines": {
+    "node": ">= 0.8.0"
+  }
 }

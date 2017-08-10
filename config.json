@@ -1,5 +1,5 @@
 {
-    "localOnly": true,
+    "localOnly": false,
     "term": {
         "termName": "xterm",
         "geometry": [65, 24],

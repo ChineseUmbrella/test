@@ -365,8 +365,8 @@
         const $window = $(`<div class="window">
             <div class="grip"></div>
             <div class="bar">
-                <div title="new" class="tab">+</div>
-                <div class="title">${title}</div>
+                <div title="new" class="tab">新建</div>
+                <div class="title">全屏</div>
             </div>
         </div>`);
         const $$ = $window.find.bind($window);
